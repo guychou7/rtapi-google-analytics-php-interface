@@ -46,7 +46,7 @@ class rtapi {
    */
   public function __construct($client_email, $key_file, $delegate_email = null) {
     if (version_compare(PHP_VERSION, '5.3.0') < 0) {
-      throw new Exception('GAPI: PHP version ' . PHP_VERSION . ' is below minimum required 5.3.0.');
+      throw new Exception('RTAPI: PHP version ' . PHP_VERSION . ' is below minimum required 5.3.0.');
     }
     $this->auth_method = new rtapiOAuth2();
     $this->auth_method->fetchToken($client_email, $key_file, $delegate_email);
@@ -96,7 +96,7 @@ class rtapi {
     if (substr($response['code'], 0, 1) == '2') {
       return $this->accountObjectMapper($response['body']);
     } else {
-      throw new Exception('GAPI: Failed to request account data. Error: "' . strip_tags($response['body']) . '"');
+      throw new Exception('RTAPI: Failed to request account data. Error: "' . strip_tags($response['body']) . '"');
     }
   }
 
@@ -203,7 +203,7 @@ class rtapi {
     if (substr($response['code'], 0, 1) == '2') {
       return $this->reportObjectMapper($response['body']);
     } else {
-      throw new Exception('GAPI: Failed to request report data. Error: "' . $this->cleanErrorResponse($response['body']) . '"');
+      throw new Exception('RTAPI: Failed to request report data. Error: "' . $this->cleanErrorResponse($response['body']) . '"');
     }
   }
   
@@ -334,7 +334,7 @@ class rtapi {
               $dimensions[str_replace('rt:', '', $header['name'])] = strval($row[$index]);
               break;
             default:
-              throw new Exception("GAPI: Unrecognized columnType '{$header['columnType']}' for columnHeader '{$header['name']}'");
+              throw new Exception("RTAPI: Unrecognized columnType '{$header['columnType']}' for columnHeader '{$header['name']}'");
           }
         }
         $results[] = new rtapiReportEntry($metrics, $dimensions);
@@ -627,7 +627,7 @@ class rtapiOAuth2 {
 
     if (!file_exists($key_file)) {
       if ( !file_exists(__DIR__."/".$key_file) ) {
-        throw new Exception('GAPI: Failed load key file "' . $key_file . '". File could not be found.');
+        throw new Exception('RTAPI: Failed load key file "' . $key_file . '". File could not be found.');
       } else {
         $key_file = __DIR__."/".$key_file;
       }
@@ -636,13 +636,13 @@ class rtapiOAuth2 {
     $key_data = file_get_contents($key_file);
     
     if (empty($key_data)) {
-      throw new Exception('GAPI: Failed load key file "' . $key_file . '". File could not be opened or is empty.');
+      throw new Exception('RTAPI: Failed load key file "' . $key_file . '". File could not be opened or is empty.');
     }
 
     openssl_pkcs12_read($key_data, $certs, 'notasecret');
 
     if (!isset($certs['pkey'])) {
-      throw new Exception('GAPI: Failed load key file "' . $key_file . '". Unable to load pkcs12 check if correct p12 format.');
+      throw new Exception('RTAPI: Failed load key file "' . $key_file . '". Unable to load pkcs12 check if correct p12 format.');
     }
 
     openssl_sign($data, $signature, openssl_pkey_get_private($certs['pkey']), "sha256");
@@ -657,7 +657,7 @@ class rtapiOAuth2 {
     $auth_token = json_decode($response['body'], true);
 
     if (substr($response['code'], 0, 1) != '2' || !is_array($auth_token) || empty($auth_token['access_token'])) {
-      throw new Exception('GAPI: Failed to authenticate user. Error: "' . strip_tags($response['body']) . '"');
+      throw new Exception('RTAPI: Failed to authenticate user. Error: "' . strip_tags($response['body']) . '"');
     }
 
     $this->auth_token = $auth_token['access_token'];
